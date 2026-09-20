@@ -1,0 +1,51 @@
+<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.Master.cs" Inherits="RemotePunch.Web.SiteMaster" %>
+<!DOCTYPE html>
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0f172a" />
+    <title>RemotePunch</title>
+    <link rel="stylesheet" href="<%= ResolveUrl("~/Content/site.css") %>" />
+    <asp:ContentPlaceHolder ID="head" runat="server" />
+</head>
+<body>
+    <form id="mainForm" runat="server">
+    <header class="topbar">
+        <div class="topbar-inner">
+            <a class="brand" href="<%= ResolveUrl("~/Punch.aspx") %>">
+                <span class="brand-dot"></span> RemotePunch
+            </a>
+            <nav class="nav">
+                <asp:PlaceHolder ID="phSignedIn" runat="server">
+                    <a href="<%= ResolveUrl("~/Punch.aspx") %>">Punch</a>
+                    <a href="<%= ResolveUrl("~/MyAttendance.aspx") %>">My attendance</a>
+                    <asp:PlaceHolder ID="phReportsNav" runat="server">
+                        <a href="<%= ResolveUrl("~/Reports.aspx") %>">Reports</a>
+                    </asp:PlaceHolder>
+                    <asp:PlaceHolder ID="phAdminNav" runat="server">
+                        <a href="<%= ResolveUrl("~/Admin/Dashboard.aspx") %>">Admin</a>
+                    </asp:PlaceHolder>
+                </asp:PlaceHolder>
+            </nav>
+            <asp:PlaceHolder ID="phUserBox" runat="server">
+                <div class="userbox">
+                    <span class="username"><asp:Literal ID="litUserName" runat="server" /></span>
+                    <a class="signout" href="<%= ResolveUrl("~/Logout.aspx") %>">Sign out</a>
+                </div>
+            </asp:PlaceHolder>
+        </div>
+    </header>
+
+    <main class="page">
+        <asp:ContentPlaceHolder ID="MainContent" runat="server" />
+    </main>
+
+    <footer class="footer">
+        <span>RemotePunch &middot; geofenced attendance</span>
+        <span class="footer-time">Server time (<asp:Literal ID="litTimeZone" runat="server" />):
+            <asp:Literal ID="litServerTime" runat="server" /></span>
+    </footer>
+    </form>
+</body>
+</html>
