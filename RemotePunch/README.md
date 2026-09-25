@@ -136,6 +136,50 @@ two tags in `Punch.aspx` and `Admin/SiteEdit.aspx`.
 
 ---
 
+## Troubleshooting: "Employee code or password is incorrect"
+
+That message is deliberately the same whether the account does not exist or the
+password is wrong, so the form cannot be used to discover employee codes. To
+find out which it is, run `tools/Check-Login.sql` against the database the app
+is pointed at:
+
+```powershell
+sqlcmd -S .\SQLEXPRESS -E -d RemotePunch -i tools\Check-Login.sql
+```
+
+**No rows, or the account is missing** — the seed script has not run against
+this database. Check `CurrentDatabase` in the output: running `02_SeedData.sql`
+while connected to `master` creates nothing useful. Re-run it with `-d
+RemotePunch`.
+
+**The account is there** — then the stored hash does not match what you typed.
+Mind the exact case and symbols (`Admin@12345`), and clear any stale value your
+browser autofilled. If it still fails, set a known password with the same .NET
+API the app verifies with:
+
+```powershell
+.\tools\Reset-RemotePunchPassword.ps1 -EmployeeCode ADMIN001 -Password 'Admin@12345'
+```
+
+That prints an `UPDATE` statement; run it against the database, or pipe it
+straight in:
+
+```powershell
+.\tools\Reset-RemotePunchPassword.ps1 -EmployeeCode ADMIN001 -Password 'Admin@12345' |
+    sqlcmd -S .\SQLEXPRESS -E -d RemotePunch
+```
+
+It also clears `FailedLoginCount` and any lockout. This is the way back in when
+every administrator is locked out, since there is otherwise no account left to
+reset passwords from.
+
+**"Too many failed attempts"** — five wrong passwords lock the account for 15
+minutes (`Auth.MaxFailedAttempts`, `Auth.LockoutMinutes`). Another admin can
+clear it from **Admin → Employees → Edit → Clear lockout**, or the script above
+does it.
+
+---
+
 ## How a punch is decided
 
 ```
