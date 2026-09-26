@@ -24,13 +24,19 @@ namespace RemotePunch.Web
     {
         protected Literal litConnection, litResult, litEmployees;
         protected PlaceHolder phResult;
-        protected TextBox txtCode, txtPassword;
-        protected Button btnTest;
+        protected TextBox txtCode, txtPassword, txtSetCode, txtSetPassword;
+        protected Button btnTest, btnSet;
+        protected PlaceHolder phSetResult;
+        protected Literal litSetResult;
+
+        /// <summary>Alert style for the set-password outcome.</summary>
+        public string SetResultClass { get; private set; }
 
         private bool _enabled;
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            SetResultClass = "alert-bad";
             _enabled = AppConfig.GetBool("Diag.Enabled", false) && Request.IsLocal;
             if (!_enabled)
             {
@@ -201,6 +207,73 @@ namespace RemotePunch.Web
             }
 
             litResult.Text = html.ToString();
+        }
+
+        /// <summary>
+        /// Sets a password the way the application itself would, so the stored
+        /// hash is correct by construction. This is why it is worth having: it
+        /// removes every step where a hand-written hash could go wrong.
+        /// </summary>
+        protected void btnSet_Click(object sender, EventArgs e)
+        {
+            if (!_enabled)
+            {
+                NotFound();
+                return;
+            }
+
+            ShowConnection();
+            phSetResult.Visible = true;
+
+            string password = txtSetPassword.Text;
+            if (password.Length == 0)
+            {
+                litSetResult.Text = "Type a password first.";
+                ShowEmployees();
+                return;
+            }
+
+            EmployeeRepository employees = new EmployeeRepository();
+            Employee employee = employees.GetByCodeOrEmail(txtSetCode.Text);
+            if (employee == null)
+            {
+                litSetResult.Text = "No employee matches '" + PageHelpers.Encode(txtSetCode.Text) +
+                                    "' in this database.";
+                ShowEmployees();
+                return;
+            }
+
+            byte[] hash, salt;
+            int iterations;
+            PasswordHasher.CreateHash(password, out hash, out salt, out iterations);
+
+            // Also clears FailedLoginCount and any lockout.
+            employees.SetPassword(employee.EmployeeId, hash, salt, iterations, false);
+
+            // Prove it round-trips through the same check the sign-in form makes.
+            Employee reloaded = employees.GetById(employee.EmployeeId);
+            bool verified = PasswordHasher.Verify(password, reloaded.PasswordHash,
+                                                  reloaded.PasswordSalt, reloaded.PasswordIterations);
+
+            new AuditRepository().Write(employee.EmployeeId, "PasswordSetViaDiagnostics",
+                "Set from the diagnostics page on the server console.", ClientInfo.FromRequest(Request));
+
+            if (verified)
+            {
+                SetResultClass = "alert-ok";
+                litSetResult.Text = "Password set for <strong>" + PageHelpers.Encode(employee.EmployeeCode) +
+                                    "</strong> and verified against the stored hash. Sign in with it now." +
+                                    (reloaded.IsActive ? "" :
+                                     " <strong>Note: this account is inactive, which blocks sign-in.</strong>");
+            }
+            else
+            {
+                litSetResult.Text = "The password was written but did not verify when read back. " +
+                                    "That points at the column types - check the hash and salt byte " +
+                                    "counts in the table below; both must be 32.";
+            }
+
+            ShowEmployees();
         }
 
         /// <summary>Answers exactly as a missing page would, revealing nothing.</summary>

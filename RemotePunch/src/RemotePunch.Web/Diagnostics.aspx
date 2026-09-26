@@ -40,6 +40,32 @@
     </div>
 
     <div class="card">
+        <h2>Set a password</h2>
+        <p class="muted small">
+            Type any password you like and press Set. The application hashes and
+            stores it with its own code, so it cannot disagree with what the
+            sign-in form checks. No minimum length is enforced here.
+        </p>
+        <div class="filters">
+            <div class="field">
+                <label for="<%= txtSetCode.ClientID %>">Employee code or email</label>
+                <asp:TextBox ID="txtSetCode" runat="server" Text="CKJHA" MaxLength="200" />
+            </div>
+            <div class="field">
+                <label for="<%= txtSetPassword.ClientID %>">New password</label>
+                <asp:TextBox ID="txtSetPassword" runat="server" MaxLength="200" />
+            </div>
+            <div class="actions">
+                <asp:Button ID="btnSet" runat="server" Text="Set password" CssClass="btn btn-primary"
+                            OnClick="btnSet_Click" />
+            </div>
+        </div>
+        <asp:PlaceHolder ID="phSetResult" runat="server" Visible="false">
+            <div class="alert <%= SetResultClass %>"><asp:Literal ID="litSetResult" runat="server" /></div>
+        </asp:PlaceHolder>
+    </div>
+
+    <div class="card">
         <h2>Accounts in this database</h2>
         <div class="table-wrap"><asp:Literal ID="litEmployees" runat="server" /></div>
     </div>
