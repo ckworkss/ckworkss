@@ -117,6 +117,10 @@
     <Compile Include="Data\GeocodeCacheRepository.cs" />
     <Compile Include="Data\PunchRepository.cs" />
     <Compile Include="Data\SiteRepository.cs" />
+    <Compile Include="Diagnostics.aspx.cs">
+      <DependentUpon>Diagnostics.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="Default.aspx.cs">
       <DependentUpon>Default.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -185,6 +189,7 @@
     <Content Include="ChangePassword.aspx" />
     <Content Include="Content\site.css" />
     <Content Include="Default.aspx" />
+    <Content Include="Diagnostics.aspx" />
     <Content Include="Error.aspx" />
     <Content Include="Global.asax" />
     <Content Include="Login.aspx" />

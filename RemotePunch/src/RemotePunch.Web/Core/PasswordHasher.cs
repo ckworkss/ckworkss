@@ -50,6 +50,17 @@ namespace RemotePunch.Web.Core
             }
         }
 
+        /// <summary>
+        /// The raw derivation, for Diagnostics.aspx only, so it can show that the
+        /// stored hash and a freshly derived one agree. Verification itself must
+        /// always go through Verify, which compares in constant time.
+        /// </summary>
+        public static byte[] DeriveForDiagnostics(string password, byte[] salt, int iterations, int outputBytes)
+        {
+            if (iterations < 1000) iterations = DefaultIterations;
+            return Derive(password, salt, iterations, outputBytes);
+        }
+
         /// <summary>Comparison whose running time does not depend on where the bytes differ.</summary>
         public static bool FixedTimeEquals(byte[] a, byte[] b)
         {
