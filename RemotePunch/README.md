@@ -180,6 +180,33 @@ does it.
 
 ---
 
+## Command-line tools
+
+Everything in `tools/` is for the cases where the admin screens are out of
+reach - the first account, or recovery when nobody can sign in. Day to day,
+use **Admin → Employees** instead.
+
+| Script | What it does |
+| --- | --- |
+| `Check-Login.sql` | Reports the connected database, every employee row and the recent audit trail |
+| `Test-RemotePunchLogin.ps1` | Runs the app's own password check against the stored hash and says why a sign-in fails |
+| `Reset-RemotePunchPassword.ps1` | Sets a known password on an existing employee and clears any lockout |
+| `New-RemotePunchEmployee.ps1` | Creates an employee, password included |
+
+The PowerShell scripts print SQL rather than running it, so you can read it
+first. Pipe to `sqlcmd` to apply it:
+
+```powershell
+.\tools\New-RemotePunchEmployee.ps1 -EmployeeCode CKJHA -FullName 'CK Jha' `
+    -Email 'ck@example.com' -Password 'Chosen-Strong-Password' -Role Admin |
+    sqlcmd -S .\SQLEXPRESS -E -d RemotePunch
+```
+
+They all derive password hashes with the same .NET API `Core/PasswordHasher.cs`
+verifies against, so an account they create or reset works immediately.
+
+---
+
 ## How a punch is decided
 
 ```
