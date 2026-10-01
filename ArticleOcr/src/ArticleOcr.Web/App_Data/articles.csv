@@ -1,0 +1,12 @@
+# Known article codes: Code,Description,Count
+# Count = how often the article is received; it becomes the prior probability of the code.
+# Replace this sample with an export from your ERP (or load from a database in OcrServiceHost).
+Code,Description,Count
+RD258150,Best Pacific 240gsm Mocha Taffy,40
+EA511872FX30,Best Pacific Vietnam 190gsm,25
+TE181065FX2-A2,Best Pacific quality TE181065,10
+EA511672FX30,Best Pacific Vietnam 190gsm,5
+RD258151,Best Pacific 240gsm,5
+RD258160,Best Pacific 240gsm,5
+WD123456HP2,Sample,2
+BK770012,Sample,2
